@@ -108,6 +108,8 @@ void InterbotixRobotXS::robot_set_joint_operating_mode(std::string const& name, 
       ROS_ERROR("Invalid command for argument 'mode' while setting the operating mode for the %s motor.", motor_name.c_str());
       continue;
     }
+    //ROS_WARN("MOTOR NAME %s",motor_name.c_str());
+    //ROS_WARN("MODE %s",mode.c_str());
     motor_map[motor_name].mode = mode;
     motor_map[motor_name].profile_type = profile_type;
   }
@@ -234,6 +236,7 @@ void InterbotixRobotXS::robot_write_commands(std::string const& name, std::vecto
 void InterbotixRobotXS::robot_write_joint_command(std::string const& name, float command)
 {
   std::string mode = motor_map[name].mode;
+  //ROS_INFO("mode: %s", mode.c_str());
   if (mode == "position" || mode == "ext_position" || mode == "current_based_position" || mode == "linear_position")
   {
     if (mode == "linear_position")
@@ -888,11 +891,13 @@ bool InterbotixRobotXS::robot_srv_get_robot_info(interbotix_xs_sdk::RobotInfo::R
       res.joint_sleep_positions.push_back(sleep_map[name]);
     res.joint_state_indices.push_back(js_index_map[name]);
     if (urdf_exists)
-    {
+    { 
+      // If there are errors, comment from here...
       ptr = model.getJoint(name);
       res.joint_lower_limits.push_back(ptr->limits->lower);
       res.joint_upper_limits.push_back(ptr->limits->upper);
-      res.joint_velocity_limits.push_back(ptr->limits->velocity);
+      res.joint_velocity_limits.push_back(ptr->limits->velocity); 
+      // ... to here
     }
   }
   return true;
